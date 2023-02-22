@@ -47,6 +47,77 @@ void setOutMuxBit(const uint8_t bitIdx, const bool value) {
       digitalWrite(REN_PIN,LOW);
 }
 
+  // Function to concatenate bits
+  uint8_t concatenateBits(int c0, int c1, int c2, int c3){
+    uint8_t result = 0;
+    result |= (c0 << 3);
+    result |= (c1 << 2);
+    result |= (c2 << 1);
+    result |= c3;
+    return result;
+  }
+
+  uint8_t readCols(){
+  digitalWrite(RA0_PIN, LOW);
+  digitalWrite(RA1_PIN, LOW);
+  digitalWrite(RA2_PIN,LOW);
+  digitalWrite(REN_PIN, HIGH);
+
+  int c0state = digitalRead(C0_PIN);
+  int c1state = digitalRead(C1_PIN);
+  int c2state = digitalRead(C2_PIN);
+  int c3state = digitalRead(C3_PIN);
+
+  // Call the concatenateBits() function with the read states
+  uint8_t cols = concatenateBits(c0state, c1state, c2state, c3state);
+  return cols;
+}
+
+void setRow(uint8_t rowIdx){
+  if (rowIdx == 0){
+    digitalWrite(RA0_PIN, LOW);
+    digitalWrite(RA1_PIN,LOW);
+    digitalWrite(RA2_PIN,LOW);
+  }
+  else if (rowIdx == 1){
+    digitalWrite(RA0_PIN, HIGH);
+    digitalWrite(RA1_PIN,LOW);
+    digitalWrite(RA2_PIN,LOW);
+  }
+  else if (rowIdx == 2){
+    digitalWrite(RA0_PIN,LOW);
+    digitalWrite(RA1_PIN,HIGH);
+    digitalWrite(RA2_PIN,LOW);
+  }
+  else if (rowIdx == 3){
+    digitalWrite(RA0_PIN,HIGH);
+    digitalWrite(RA1_PIN,HIGH);
+    digitalWrite(RA2_PIN,LOW);
+  }
+  else if (rowIdx == 4){
+    digitalWrite(RA0_PIN,LOW);
+    digitalWrite(RA1_PIN,LOW);
+    digitalWrite(RA2_PIN,HIGH);
+  }
+  else if (rowIdx == 5){
+    digitalWrite(RA0_PIN,HIGH);
+    digitalWrite(RA1_PIN,LOW);
+    digitalWrite(RA2_PIN,HIGH);
+  }
+  else if (rowIdx == 6){
+    digitalWrite(RA0_PIN,LOW);
+    digitalWrite(RA1_PIN,HIGH);
+    digitalWrite(RA2_PIN,HIGH);
+  }
+  else if (rowIdx == 7){
+    digitalWrite(RA0_PIN,HIGH);
+    digitalWrite(RA1_PIN,HIGH);
+    digitalWrite(RA2_PIN,HIGH);
+  }
+}
+
+
+
 void setup() {
   // put your setup code here, to run once:
 
@@ -91,11 +162,18 @@ void loop() {
     u8g2.clearBuffer();         // clear the internal memory
     u8g2.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
     u8g2.drawStr(2,10,"Helllo World!");  // write something to the internal memory
+    uint8_t keys = readCols();
     u8g2.setCursor(2,20);
-    u8g2.print(count++);
+    // u8g2.print(count++);
+    u8g2.print(keys,BIN); 
     u8g2.sendBuffer();          // transfer internal memory to the display
-
+    
     //Toggle LED
     digitalToggle(LED_BUILTIN);
+
+    // printFullBin(readCols());
+    Serial.println(readCols(),BIN);
   }
+
 }
+
